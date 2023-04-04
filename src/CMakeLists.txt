@@ -10,7 +10,6 @@ set(PROJECT_VERSION "1.0")
 set(PROJECT_CONTACT "konstantin.roeder@kcl.ac.uk")
 
 get_filename_component(GIT_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
-message("Root: ${CMAKE_CURRENT_SOURCE_DIR}") 
 
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
@@ -24,12 +23,12 @@ set (FORTRAN_FREEFORM_FLAG "-ffree-form" CACHE TYPE STRING)
 include_directories(${CMAKE_SOURCE_DIR})
 # Glob all the sources
 file(GLOB PITCH_LIB_SOURCES ${GIT_ROOT}/src/*.f90)
-message("All sources: ${PITCH_LIB_SOURCES}") 
-message("Root: ${SOURCE_DIR}") 
-add_library(pitchlib ${PITCH_LIB_SOURCES})
-set_target_properties(pitchlib PROPERTIES LINKER_LANGUAGE "Fortran")
+file(GLOB NOT_SOURCES ${GIT_ROOT}/src/calc_pitch_angles.f90)
+list(REMOVE_ITEM PITCH_LIB_SOURCES ${NOT_SOURCES})
 
-add_executable(PitchAngles calc_pitch_angles.f90)
+add_library(pitchlib ${PITCH_LIB_SOURCES})
+
+add_executable(PitchAngles ${GIT_ROOT}/src/calc_pitch_angles.f90)
 set_target_properties(PitchAngles PROPERTIES LINKER_LANGUAGE "Fortran") 
-add_dependencies(PitchAngles pitchlib)
 target_link_libraries(PitchAngles pitchlib)
+
