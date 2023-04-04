@@ -63,6 +63,8 @@ MODULE PARSE_TOPOLOGY
 
          ! create atomdata
          CALL POPULATE_ATOMDATA()
+         ! find all molecules
+         CALL FIND_TERMINI()
       END SUBROUTINE READ_TOP
 
       SUBROUTINE POPULATE_ATOMDATA()
@@ -83,6 +85,35 @@ MODULE PARSE_TOPOLOGY
          END DO
 
       END SUBROUTINE POPULATE_ATOMDATA
+
+      SUBROUTINE FIND_TERMINI()
+         IMPLICIT NONE
+         INTEGER :: TMPTER(NRES)
+         INTEGER :: I, J
+         
+         NTERMINI = 0
+         TMPTER(1:NRES) = -1
+         DO I=1,NATOMS
+            IF (ATOMNAMES(I).EQ."OXT") THEN
+               DO J=1,NRES
+                  IF ((FIRSTAT(J).LE.I).AND.(LASTAT(J).GE.I)) THEN
+                     NTERMINI = NTERMINI + 1
+                     TMPTER(NTERMINI) = J
+                     EXIT
+                  END IF
+               END DO
+            END IF
+         END DO
+         ALLOCATE(TERMINI(NTERMINI,2))
+         DO I=1,NTERMINI
+            TERMINI(I,2) = TMPTER(I)
+            IF (I.EQ.1) THEN
+               TERMINI(I,1) = 1
+            ELSE
+               TERMINI(I,1) = TERMINI(I-1,2) + 1
+            END IF
+         END DO
+      END SUBROUTINE
 
       SUBROUTINE ALLOC_TOP()
          CALL DEALLOC_TOP()

@@ -23,4 +23,13 @@ MODULE COMMONS
    INTEGER :: NPOINT1, NPOINT2
    INTEGER, ALLOCATABLE :: ATSFOR1(:), ATSFOR2(:)
 
+   !> number of peptide bonds
+   INTEGER :: NPEPBONDS = 0
+   !> identities of the atoms in these bonds
+   INTEGER, ALLOCATABLE :: PEPBONDS(:,:)
+   
+   !> number of termini
+   INTEGER :: NTERMINI = 0
+   INTEGER, ALLOCATABLE :: TERMINI(:,:)
+
 END MODULE COMMONS
