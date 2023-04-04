@@ -1,6 +1,26 @@
 MODULE UTILITIES
    
    CONTAINS
+
+      SUBROUTINE LOOKUP_ATOM(RESID,ATOM,ATOMID)
+         USE COMMONS, ONLY: ATOMDATA
+         IMPLICIT NONE
+         INTEGER, INTENT(IN) :: RESID
+         CHARACTER(LEN=4), INTENT(IN) :: ATOM
+         INTEGER, INTENT(OUT) :: ATOMID
+         INTEGER :: NATS, I
+
+         ATOMID = -1
+         NATS = ATOMDATA(RESID)%NATS
+         DO I=1,NATS
+            IF (ATOM.EQ.ATOMDATA(RESID)%ATOMNAMES(I)) THEN
+               ATOMID = ATOMDATA(RESID)%ATOMIDS(I)
+               RETURN
+            END IF
+         ENDDO
+
+      END SUBROUTINE LOOKUP_ATOM
+
       !> Function to find empty unit for output/input file
       INTEGER FUNCTION GETUNIT()
          IMPLICIT NONE
@@ -52,5 +72,5 @@ MODULE UTILITIES
                J1=J1+1
          ENDDO
       END SUBROUTINE READ_LINE
-      
+
 END MODULE UTILITIES
