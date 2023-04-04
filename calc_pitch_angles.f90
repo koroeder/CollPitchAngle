@@ -1,25 +1,26 @@
 PROGRAM CALCPITCH
-   USE PARSE_TOPOLOGY, ONLY: NATOMS, NRES, ATOMDATA, RESNAMES, READ_TOP
+   USE COMMONS
    USE UTILITIES, ONLY: GETUNIT
+   USE CALCPROPERTIES, ONLY: GET_HELAX
    IMPLICIT NONE
-   !> real, double precision 64-bit
-   INTEGER, PARAMETER  :: REAL64 = SELECTED_REAL_KIND(15, 307)
 
    !> name of topology file 
    CHARACTER(LEN=25) :: TOPFILE="coords.prmtop"
    !> number of minima to be parsed
    INTEGER :: NMIN = 0
+
    !> current coordinates
    REAL(KIND=REAL64), ALLOCATABLE :: CURRX(:)
    !> unit for points.min
    INTEGER :: XUNIT
    INTEGER ::I, J
 
-
    ! initialise program
    CALL INIT_PROG()
    ! parse topology
    CALL READ_TOP(TOPFILE)
+   !get atom ids for helical axis
+   CALL ATOMSFORAXIS()
    !allocate coordinate array
    ALLOCATE(CURRX(3*NATOMS))
 
@@ -28,6 +29,7 @@ PROGRAM CALCPITCH
    OPEN(XUNIT,FILE='points.min',ACCESS='DIRECT',ACTION='READ',FORM='UNFORMATTED',STATUS='UNKNOWN',RECL=8*3*NATOMS)
    DO I = 1,NMIN
       READ(XUNIT,REC=I) (CURRX(J),J=1,3*NATOMS)
+      CALL GET_HELAX(CURRX)
    END DO
    CLOSE(XUNIT)
 
@@ -77,5 +79,28 @@ PROGRAM CALCPITCH
          END IF
 
       END SUBROUTINE INIT_PROG
+
+      SUBROUTINE ATOMSFORAXIS()
+         USE UTILITIES, ONLY: GETUNIT
+         IMPLICIT NONE
+         LOGICAL :: INPFOUND
+         CHARACTER(LEN=25) :: INPUTFILE="atoms_helax.dat"
+         INTEGER ::INUNIT, I
+
+         INQUIRE(FILE=INPUTFILE,EXIST=INPFOUND)
+         IF (.NOT.INPFOUND) THEN
+            WRITE(*,*) " atomsforax> Cannot locate ", INPUTFILE, " - STOP"
+            STOP
+         END IF
+         INUNIT = GETUNIT()
+         OPEN(INUNIT, FILE=INPUTFILE, STATUS='OLD')
+         READ(INUNIT,'(I6)') NPOINT1
+         ALLOCATE(ATSFOR1(NPOINT1))
+         READ(INUNIT,'(I6)') (ATSFOR1(I), I=1,NPOINT1)
+         READ(INUNIT,'(I6)') NPOINT2       
+         ALLOCATE(ATSFOR2(NPOINT2))
+         READ(INUNIT,'(I6)') (ATSFOR2(I), I=1,NPOINT2)
+         CLOSE(INUNIT)
+      END SUBROUTINE ATOMSFORAXIS
 
 END PROGRAM CALCPITCH
