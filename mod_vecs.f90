@@ -63,4 +63,16 @@ MODULE VECTORS
          v3(3) = v2(3) - v1(3)
       end function vec_diff
 
+      PURE FUNCTION ANGLE(V1,V2)
+         REAL(KIND=REAL64) :: ANGLE
+         REAL(KIND=REAL64), DIMENSION(3), INTENT(IN) :: V1,V2
+         REAL(KIND=REAL64) :: DP, NORM1, NORM2
+
+         DP = DOT_PRODUCT(V1,V2)
+         NORM1 = EUC_NORM(V1)
+         NORM2 = EUC_NORM(V2)        
+
+         ANGLE=ACOS(DP/(NORM1*NORM2))*180.00/3.141593        
+      END FUNCTION ANGLE
+
 END MODULE VECTORS
