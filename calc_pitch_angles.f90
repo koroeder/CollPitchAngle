@@ -11,8 +11,8 @@ PROGRAM CALCPITCH
 
    !> current coordinates
    REAL(KIND=REAL64), ALLOCATABLE :: CURRX(:)
-   !> unit for points.min
-   INTEGER :: XUNIT
+   !> unit for points.min and output
+   INTEGER :: XUNIT, PEPUNIT, METHUNIT
    INTEGER ::I, J
 
    ! initialise program
@@ -44,6 +44,19 @@ PROGRAM CALCPITCH
    END DO
    CLOSE(XUNIT)
 
+   PEPUNIT = GETUNIT()
+   OPEN(PEPUNIT, FILE='pitch_pep.dat', STATUS='NEW')
+   WRITE(PEPUNIT,'(2I8)') NMIN, NPEPBONDS
+   WRITE(PEPUNIT, * ) PEPANGLES
+   CLOSE(PEPUNIT)
+
+   METHUNIT = GETUNIT()
+   OPEN(METHUNIT, FILE='pitch_methylene.dat', STATUS='NEW')
+   WRITE(METHUNIT,'(2I8)') NMIN, NMETHYLENE
+   WRITE(METHUNIT)
+
+   STOP
+   
    CONTAINS
       SUBROUTINE INIT_PROG()
          USE UTILITIES, ONLY: GETUNIT
