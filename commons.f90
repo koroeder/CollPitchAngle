@@ -33,7 +33,12 @@ MODULE COMMONS
    INTEGER, ALLOCATABLE :: TERMINI(:,:)
 
    !> number of methylene groups
-   INTEGER :: NMETHYLENE
+   INTEGER :: NMETHYLENE = 0
    INTEGER, ALLOCATABLE :: METHYLENEGROUPS(:,:)
+
+   !> pitch angle for peptides
+   REAL(KIND=REAL64), ALLOCATABLE :: PEPANGLES(:,:)
+   !> pitch angles for methylene groups
+   REAL(KIND=REAL64), ALLOCATABLE :: METHYLENEANGLES(:,:)
 
 END MODULE COMMONS

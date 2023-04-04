@@ -1,7 +1,7 @@
 PROGRAM CALCPITCH
    USE COMMONS
    USE UTILITIES, ONLY: GETUNIT
-   USE CALCPROPERTIES, ONLY: GET_HELAX
+   USE CALCPROPERTIES, ONLY: GET_HELAX, DETERMINE_PEPTIDE, FIND_METHYLENE
    IMPLICIT NONE
 
    !> name of topology file 
@@ -23,8 +23,15 @@ PROGRAM CALCPITCH
    CALL READ_TOP(TOPFILE)
    !get atom ids for helical axis
    CALL ATOMSFORAXIS()
+   ! get all peptide bonds
+   CALL DETERMINE_PEPTIDE()
+   ! get all methylene groups
+   CALL FIND_METHYLENE()
    !allocate coordinate array
    ALLOCATE(CURRX(3*NATOMS))
+   ! allocate arrays for storing data
+   ALLOCATE(PEPANGLES(NMIN,NPEPBONDS))
+   ALLOCATE(METHYLENEANGLES(NMIN,NMETHYLENE))
 
    ! iterate over all structures
    XUNIT = GETUNIT()
@@ -32,6 +39,8 @@ PROGRAM CALCPITCH
    DO I = 1,NMIN
       READ(XUNIT,REC=I) (CURRX(J),J=1,3*NATOMS)
       CALL GET_HELAX(CURRX)
+      CALL PEPTIDE_PITCH(I,CURRX)
+      CALL METHYLENE_PITCH(I,CURRX)
    END DO
    CLOSE(XUNIT)
 
