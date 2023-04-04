@@ -48,11 +48,14 @@ MODULE PARSE_TOPOLOGY
                   CALL ALLOC_TOP()
                   !we should now be ready to populate the remaining sections
                CASE("ATOM_NAME")
+                  READ(TOPUNIT,*)
                   READ(TOPUNIT,'(20A4)') (ATOMNAMES(J), J=1,NATOMS)
                CASE("RESIDUE_LABEL")
+                  READ(TOPUNIT,*)
                   READ(TOPUNIT,'(20A4)') (RESNAMES(J), J=1,NRES)
                CASE("RESIDUE_POINTER")
-                  READ(TOPUNIT,'(12I6)') (FIRSTAT(J), J=1,NRES)
+                  READ(TOPUNIT,*)
+                  READ(TOPUNIT,'(10I8)') (FIRSTAT(J), J=1,NRES)
                   DO J=2,NRES
                      LASTAT(J-1) = FIRSTAT(J) - 1
                   END DO

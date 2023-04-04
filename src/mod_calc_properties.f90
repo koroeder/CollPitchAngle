@@ -102,7 +102,7 @@ MODULE CALCPROPERTIES
             IF ((AT1.EQ.-1).OR.(AT2.EQ.-1)) CYCLE
             NPEPBONDS = NPEPBONDS + 1
             TMPBONDS(NPEPBONDS,1) = AT1
-            TMPBONDS(NPEPBONDS,1) = AT2           
+            TMPBONDS(NPEPBONDS,2) = AT2           
          END DO
          ALLOCATE(PEPBONDS(NPEPBONDS,2))
          DO I=1,NPEPBONDS
