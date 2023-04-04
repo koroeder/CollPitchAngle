@@ -64,4 +64,63 @@ MODULE CALCPROPERTIES
             PEPBONDS(I,2) = TMPBONDS(I,2)
          END DO
       END SUBROUTINE DETERMINE_PEPTIDE
+
+      SUBROUTINE FIND_METHYLENE()
+         USE UTILITIES, ONLY: LOOKUP_ATOM
+         IMPLICIT NONE
+         
+         INTEGER :: TMPMETH(3*NRES,3)
+         INTEGER :: I, AT1, AT2, AT3
+         
+         DO I=1,NRES
+            IF (RESNAMES(I).EQ."PRO") THEN
+               CALL LOOKUP_ATOM(I,"CD",AT1)
+               CALL LOOKUP_ATOM(I,"HD2",AT2)  
+               CALL LOOKUP_ATOM(I,"HD3",AT3)  
+               NMETHYLENE = NMETHYLENE + 1
+               TMPMETH(NMETHYLENE,1) = AT1
+               TMPMETH(NMETHYLENE,2) = AT2
+               TMPMETH(NMETHYLENE,3) = AT3
+
+               CALL LOOKUP_ATOM(I,"CG",AT1)
+               CALL LOOKUP_ATOM(I,"HG2",AT2)  
+               CALL LOOKUP_ATOM(I,"HG3",AT3)  
+               NMETHYLENE = NMETHYLENE + 1
+               TMPMETH(NMETHYLENE,1) = AT1
+               TMPMETH(NMETHYLENE,2) = AT2
+               TMPMETH(NMETHYLENE,3) = AT3
+
+               CALL LOOKUP_ATOM(I,"CB",AT1)
+               CALL LOOKUP_ATOM(I,"HB2",AT2)  
+               CALL LOOKUP_ATOM(I,"HB3",AT3)  
+               NMETHYLENE = NMETHYLENE + 1
+               TMPMETH(NMETHYLENE,1) = AT1
+               TMPMETH(NMETHYLENE,2) = AT2
+               TMPMETH(NMETHYLENE,3) = AT3
+
+            ELSE IF (RESNAMES(I).EQ."HYP") THEN
+               CALL LOOKUP_ATOM(I,"CD",AT1)
+               CALL LOOKUP_ATOM(I,"HD2",AT2)  
+               CALL LOOKUP_ATOM(I,"HD3",AT3)  
+               NMETHYLENE = NMETHYLENE + 1
+               TMPMETH(NMETHYLENE,1) = AT1
+               TMPMETH(NMETHYLENE,2) = AT2
+               TMPMETH(NMETHYLENE,3) = AT3
+
+               CALL LOOKUP_ATOM(I,"CB",AT1)
+               CALL LOOKUP_ATOM(I,"HB2",AT2)  
+               CALL LOOKUP_ATOM(I,"HB3",AT3)  
+               NMETHYLENE = NMETHYLENE + 1
+               TMPMETH(NMETHYLENE,1) = AT1
+               TMPMETH(NMETHYLENE,2) = AT2
+               TMPMETH(NMETHYLENE,3) = AT3
+            END IF
+         ENDDO
+         ALLOCATE(METHYLENEGROUPS(NMETHYLENE,3))
+         DO I=1,NMETHYLENE
+            METHYLENEGROUPS(I,1) = TMPMETH(NMETHYLENE,1)
+            METHYLENEGROUPS(I,2) = TMPMETH(NMETHYLENE,2)
+            METHYLENEGROUPS(I,3) = TMPMETH(NMETHYLENE,3)
+         END DO
+      END SUBROUTINE FIND_METHYLENE
 END MODULE CALCPROPERTIES
