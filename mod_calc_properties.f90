@@ -5,6 +5,52 @@ MODULE CALCPROPERTIES
    REAL(KIND=REAL64), SAVE :: HELAX(3)
 
    CONTAINS
+
+      SUBROUTINE PEPTIDE_PITCH(IMIN, X)
+         USE VECTORS, ONLY: ANGLE, VEC_DIFF
+         IMPLICIT NONE
+         INTEGER, INTENT(IN) :: IMIN
+         REAL(KIND=REAL64), INTENT(IN) :: X(3*NATOMS)
+         REAL(KIND=REAL64) :: XC(3), XN(3), PEP(3)
+         INTEGER :: I, AT1, AT2, IDX
+
+         DO I=1,NPEPBONDS
+            AT1=PEPBONDS(I,1)
+            AT2=PEPBONDS(I,2)
+            IDX = 3*(AT1-1)
+            XC(1:3) = X(IDX+1:IDX+3)
+            IDX = 3*(AT2-1)
+            XN(1:3) = X(IDX+1:IDX+3)
+            PEP(1:3) = VEC_DIFF(XC, XN)
+            PEPANGLES(IMIN,I) = ANGLE(HELAX,PEP)
+         END DO
+
+      END SUBROUTINE PEPTIDE_PITCH
+
+      SUBROUTINE METHYLENE_PITCH(IMIN,X)
+         USE VECTORS, ONLY: ANGLE, VEC_DIFF
+         IMPLICIT NONE
+         INTEGER, INTENT(IN) :: IMIN
+         REAL(KIND=REAL64), INTENT(IN) :: X(3*NATOMS)
+         REAL(KIND=REAL64) :: XC(3), XH1(3), XH2(3), XH12(3), VEC(3)
+         INTEGER :: I, AT1, AT2, AT3, IDX
+
+         DO I=1,NMETHYLENE
+            AT1=METHYLENEGROUPS(I,1)
+            AT2=METHYLENEGROUPS(I,2)
+            AT3=METHYLENEGROUPS(I,3)
+            IDX = 3*(AT1-1)
+            XC(1:3) = X(IDX+1:IDX+3)
+            IDX = 3*(AT2-1)
+            XH1(1:3) = X(IDX+1:IDX+3)
+            IDX = 3*(AT3-1)
+            XH2(1:3) = X(IDX+1:IDX+3) 
+            XH12(1:3) = (XH1+XH2)/2.0D0          
+            VEC(1:3) = VEC_DIFF(XC, XH12)
+            METHYLENEANGLES(IMIN,I) = ANGLE(HELAX,VEC)
+         END DO
+      END SUBROUTINE METHYLENE_PITCH
+
       SUBROUTINE GET_HELAX(X)
          IMPLICIT NONE
          REAL(KIND=REAL64), INTENT(IN) :: X(3*NATOMS)
