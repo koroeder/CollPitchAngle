@@ -64,7 +64,7 @@ MODULE PARSE_TOPOLOGY
          ! create atomdata
          CALL POPULATE_ATOMDATA()
          ! find all molecules
-         CALL FIND_TERMINI()
+         IF (.NOT.ALLOCATED(TERMINI)) CALL FIND_TERMINI()
       END SUBROUTINE READ_TOP
 
       SUBROUTINE POPULATE_ATOMDATA()
@@ -90,7 +90,7 @@ MODULE PARSE_TOPOLOGY
          IMPLICIT NONE
          INTEGER :: TMPTER(NRES)
          INTEGER :: I, J
-         
+
          NTERMINI = 0
          TMPTER(1:NRES) = -1
          DO I=1,NATOMS

@@ -17,6 +17,8 @@ PROGRAM CALCPITCH
 
    ! initialise program
    CALL INIT_PROG()
+   !initialise molecule numbers from files
+   CALL GET_TERMINI()
    ! parse topology
    CALL READ_TOP(TOPFILE)
    !get atom ids for helical axis
@@ -102,5 +104,25 @@ PROGRAM CALCPITCH
          READ(INUNIT,'(I6)') (ATSFOR2(I), I=1,NPOINT2)
          CLOSE(INUNIT)
       END SUBROUTINE ATOMSFORAXIS
+
+      SUBROUTINE  GET_TERMINI()
+         USE UTILITIES, ONLY: GETUNIT
+         IMPLICIT NONE
+         LOGICAL :: INPFOUND
+         CHARACTER(LEN=25) :: INPUTFILE="termini.dat"
+         INTEGER ::INUNIT, I
+
+         INQUIRE(FILE=INPUTFILE,EXIST=INPFOUND)
+         IF (.NOT.INPFOUND) THEN
+            WRITE(*,*) " get_termini> Cannot locate ", INPUTFILE, " - will attmept to get termini from topology"
+            RETURN
+         END IF
+         INUNIT = GETUNIT()
+         OPEN(INUNIT, FILE=INPUTFILE, STATUS='OLD')
+         READ(INUNIT,'(I6)') NTERMINI        
+         ALLOCATE(TERMINI(NTERMINI))
+         READ(INUNIT,'(I6)') (TERMINI(I,1), TERMINI(I,2), I=1,NTERMINI)         
+         CLOSE(INUNIT)
+      END SUBROUTINE GET_TERMINI
 
 END PROGRAM CALCPITCH
