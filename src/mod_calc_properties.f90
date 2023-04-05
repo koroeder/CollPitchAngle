@@ -51,6 +51,54 @@ MODULE CALCPROPERTIES
          END DO
       END SUBROUTINE METHYLENE_PITCH
 
+      SUBROUTINE METH_PRO_PITCH(IMIN,X)
+         USE VECTORS, ONLY: ANGLE, VEC_DIFF
+         IMPLICIT NONE
+         INTEGER, INTENT(IN) :: IMIN
+         REAL(KIND=REAL64), INTENT(IN) :: X(3*NATOMS)
+         REAL(KIND=REAL64) :: XC(3), XH1(3), XH2(3), XH12(3), VEC(3)
+         INTEGER :: I, AT1, AT2, AT3, IDX
+
+         DO I=1,NMETHPRO
+            AT1=METH_PRO_GROUPS(I,1)
+            AT2=METH_PRO_GROUPS(I,2)
+            AT3=METH_PRO_GROUPS(I,3)
+            IDX = 3*(AT1-1)
+            XC(1:3) = X(IDX+1:IDX+3)
+            IDX = 3*(AT2-1)
+            XH1(1:3) = X(IDX+1:IDX+3)
+            IDX = 3*(AT3-1)
+            XH2(1:3) = X(IDX+1:IDX+3) 
+            XH12(1:3) = (XH1+XH2)/2.0D0          
+            VEC(1:3) = VEC_DIFF(XC, XH12)
+            METH_PRO_ANGLES(IMIN,I) = ANGLE(HELAX,VEC)
+         END DO
+      END SUBROUTINE METH_PRO_PITCH
+
+      SUBROUTINE METH_HYP_PITCH(IMIN,X)
+         USE VECTORS, ONLY: ANGLE, VEC_DIFF
+         IMPLICIT NONE
+         INTEGER, INTENT(IN) :: IMIN
+         REAL(KIND=REAL64), INTENT(IN) :: X(3*NATOMS)
+         REAL(KIND=REAL64) :: XC(3), XH1(3), XH2(3), XH12(3), VEC(3)
+         INTEGER :: I, AT1, AT2, AT3, IDX
+
+         DO I=1,NMETHHYP
+            AT1=METH_HYP_GROUPS(I,1)
+            AT2=METH_HYP_GROUPS(I,2)
+            AT3=METH_HYP_GROUPS(I,3)
+            IDX = 3*(AT1-1)
+            XC(1:3) = X(IDX+1:IDX+3)
+            IDX = 3*(AT2-1)
+            XH1(1:3) = X(IDX+1:IDX+3)
+            IDX = 3*(AT3-1)
+            XH2(1:3) = X(IDX+1:IDX+3) 
+            XH12(1:3) = (XH1+XH2)/2.0D0          
+            VEC(1:3) = VEC_DIFF(XC, XH12)
+            METH_HYP_ANGLES(IMIN,I) = ANGLE(HELAX,VEC)
+         END DO
+      END SUBROUTINE METH_HYP_PITCH
+
       SUBROUTINE GET_HELAX(X)
          IMPLICIT NONE
          REAL(KIND=REAL64), INTENT(IN) :: X(3*NATOMS)
@@ -169,4 +217,71 @@ MODULE CALCPROPERTIES
             METHYLENEGROUPS(I,3) = TMPMETH(NMETHYLENE,3)
          END DO
       END SUBROUTINE FIND_METHYLENE
+
+      SUBROUTINE FIND_METHYLENE2()
+         USE UTILITIES, ONLY: LOOKUP_ATOM
+         IMPLICIT NONE
+         
+         INTEGER :: TMPMETHPRO(3*NRES,3)
+         INTEGER :: TMPMETHHYP(3*NRES,3)
+         INTEGER :: I, AT1, AT2, AT3
+         
+         DO I=1,NRES
+            IF (RESNAMES(I).EQ."PRO") THEN
+               CALL LOOKUP_ATOM(I,"CD",AT1)
+               CALL LOOKUP_ATOM(I,"HD2",AT2)  
+               CALL LOOKUP_ATOM(I,"HD3",AT3)  
+               NMETHPRO = NMETHPRO + 1
+               TMPMETHPRO(NMETHPRO,1) = AT1
+               TMPMETHPRO(NMETHPRO,2) = AT2
+               TMPMETHPRO(NMETHPRO,3) = AT3
+
+               CALL LOOKUP_ATOM(I,"CG",AT1)
+               CALL LOOKUP_ATOM(I,"HG2",AT2)  
+               CALL LOOKUP_ATOM(I,"HG3",AT3)  
+               NMETHPRO = NMETHPRO + 1
+               TMPMETHPRO(NMETHPRO,1) = AT1
+               TMPMETHPRO(NMETHPRO,2) = AT2
+               TMPMETHPRO(NMETHPRO,3) = AT3
+
+               CALL LOOKUP_ATOM(I,"CB",AT1)
+               CALL LOOKUP_ATOM(I,"HB2",AT2)  
+               CALL LOOKUP_ATOM(I,"HB3",AT3)  
+               NMETHPRO = NMETHPRO + 1
+               TMPMETHPRO(NMETHPRO,1) = AT1
+               TMPMETHPRO(NMETHPRO,2) = AT2
+               TMPMETHPRO(NMETHPRO,3) = AT3
+
+            ELSE IF (RESNAMES(I).EQ."HYP") THEN
+               CALL LOOKUP_ATOM(I,"CD",AT1)
+               CALL LOOKUP_ATOM(I,"HD2",AT2)  
+               CALL LOOKUP_ATOM(I,"HD3",AT3)  
+               NMETHHYP = NMETHHYP + 1
+               TMPMETHHYP(NMETHHYP,1) = AT1
+               TMPMETHHYP(NMETHHYP,2) = AT2
+               TMPMETHHYP(NMETHHYP,3) = AT3
+
+               CALL LOOKUP_ATOM(I,"CB",AT1)
+               CALL LOOKUP_ATOM(I,"HB2",AT2)  
+               CALL LOOKUP_ATOM(I,"HB3",AT3)  
+               NMETHHYP = NMETHHYP + 1
+               TMPMETHHYP(NMETHHYP,1) = AT1
+               TMPMETHHYP(NMETHHYP,2) = AT2
+               TMPMETHHYP(NMETHHYP,3) = AT3
+            END IF
+         ENDDO
+         ALLOCATE(METH_PRO_GROUPS(NMETHPRO,3))
+         DO I=1,NMETHPRO
+            METH_PRO_GROUPS(I,1) = TMPMETHPRO(NMETHPRO,1)
+            METH_PRO_GROUPS(I,2) = TMPMETHPRO(NMETHPRO,2)
+            METH_PRO_GROUPS(I,3) = TMPMETHPRO(NMETHPRO,3)
+         END DO
+         ALLOCATE(METH_HYP_GROUPS(NMETHHYP,3))
+         DO I=1,NMETHHYP
+            METH_HYP_GROUPS(I,1) = TMPMETHHYP(NMETHHYP,1)
+            METH_HYP_GROUPS(I,2) = TMPMETHHYP(NMETHHYP,2)
+            METH_HYP_GROUPS(I,3) = TMPMETHHYP(NMETHHYP,3)
+         END DO         
+      END SUBROUTINE FIND_METHYLENE2
+
 END MODULE CALCPROPERTIES
