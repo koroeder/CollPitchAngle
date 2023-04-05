@@ -8,14 +8,16 @@ help()
   echo "Requires cmake and a fortran compiler"
   echo "By the default gnu compilers are used"
   echo "" 
-  echo "usage: createHIREexec [-f compiler] | [-h]"
+  echo "usage: createHIREexec [-f compiler] [-d] | [-h]"
   echo ""
+  echo "-d - Debug version"
   echo "-f - Fortran compiler - specify the compiler (default: gfortran)"
   echo "-h - Display this help"
 }
 
 ## Main installer
 fcompiler="gfortran"
+buildtype="Release"
 
 #parse the options provided
 while [ "$1" != "" ]; do
@@ -23,7 +25,9 @@ while [ "$1" != "" ]; do
 	-f | --fortran )  shift
 		          fcompiler="$1"
 			  ;;
-	-h | --help ) help
+	-d | --debug ) buildtype="Debug"
+		       ;;
+        -h | --help ) help
 		      exit
 		      ;;
 	* ) help
@@ -43,7 +47,7 @@ else
 	cd build
 fi
 
-FC=$fcompiler cmake ../src 
+FC=$fcompiler cmake ../src -DCMAKE_BUILD_TYPE=$buildtype 
 
 make
 
