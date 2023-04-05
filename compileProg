@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# compileProg - A script to compile the executable
+
+help()
+{
+  echo "Script to create executable"
+  echo "Requires cmake and a fortran compiler"
+  echo "By the default gnu compilers are used"
+  echo "" 
+  echo "usage: createHIREexec [-f compiler] | [-h]"
+  echo ""
+  echo "-f - Fortran compiler - specify the compiler (default: gfortran)"
+  echo "-h - Display this help"
+}
+
+## Main installer
+fcompiler="gfortran"
+
+#parse the options provided
+while [ "$1" != "" ]; do
+	case $1 in 
+	-f | --fortran )  shift
+		          fcompiler="$1"
+			  ;;
+	-h | --help ) help
+		      exit
+		      ;;
+	* ) help
+	    exit 1
+esac
+shift
+done
+
+#set directory name and set up directory
+current="$(pwd)"
+
+if [ -d build ]; then
+        cd build
+	rm -rf *
+else
+	mkdir -p build
+	cd build
+fi
+
+FC=$fcompiler cmake ../src 
+
+make
+
+cp  PitchAngles $current/
+
+cd $current
+exit
