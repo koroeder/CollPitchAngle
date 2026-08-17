@@ -1,0 +1,28 @@
+1. Create trajectory as pdbs from xtc in input
+
+2. Use function below or similar to split into individual structures
+
+function SplitPDBbyModels() {
+    if [ -z "$1" ]; then 
+        echo "Usage: SplitPDBbyModels <input.pdb>"
+        return 1
+    fi
+    
+    awk '/^MODEL/ {
+      if (out) close(out);
+      out=sprintf("model_%d.pdb",++m)
+    } 
+    {print > out}' "$1"
+}
+
+3. Adjust run_computation.sh to match number of minima and the location of script
+
+4. Compute average with energies as second input
+
+
+Folders:
+Version1 - older version using fortran
+
+input - xtc files as database
+
+output -  e and rho files for each force
